@@ -17,10 +17,20 @@ from logging.handlers import RotatingFileHandler
 from sys import exit
 import urllib.request
 import dotenv
+
+# Keep original alias used in project
 import telegram.ext as tg
 
+# Import pyrogram
 from pyrogram import Client
 
+# Optional import for Bot object
+try:
+    from telegram import Bot as TgBot  # python-telegram-bot
+except Exception:
+    TgBot = None
+
+# Clear old logs if present
 if os.path.exists("FuZionXLogs.txt"):
     with open("FuZionXLogs.txt", "r+") as f_d:
         f_d.truncate(0)
@@ -43,20 +53,8 @@ logging.getLogger("PIL").setLevel(logging.WARNING)
 
 LOGGER = logging.getLogger(__name__)
 
-user_specific_config=dict()
+user_specific_config = dict()
 dotenv.load_dotenv("config.env")
-
-# checking compulsory variable NOT NEEDED FOR OKTETO!! Just Use Your Brain
-'''
-for imp in ["TG_BOT_TOKEN", "APP_ID", "API_HASH", "OWNER_ID", "AUTH_CHANNEL"]:
-    try:
-        value = os.environ[imp]
-        if not value:
-            raise KeyError
-    except KeyError:
-        LOGGER.critical(f"Oh...{imp} is missing from config.env ... fill that")
-        exit()
-'''
 
 # The Telegram API things >>>>>>>>>>>
 TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "7857092417:AAHqALkEC4YwpdFPTV0g3yQsdQkPI8hPpv0")
@@ -66,9 +64,15 @@ OWNER_ID = int(os.environ.get("OWNER_ID", "6859451629"))
 
 # Authorised Chat Functions >>>>>>>>>>>
 AUTH_CHANNEL = [int(x) for x in os.environ.get("AUTH_CHANNEL", "-1002084819782").split()]
-SUDO_USERS = [int(sudos) if (' ' not in os.environ.get('SUDO_USERS', '')) else int(sudos) for sudos in os.environ.get('SUDO_USERS', '').split()]
+# SUDO_USERS parsing - safe fallback if empty
+_sudo_env = os.environ.get("SUDO_USERS", "").strip()
+if _sudo_env:
+    SUDO_USERS = [int(sudos) for sudos in _sudo_env.split()]
+else:
+    SUDO_USERS = []
 AUTH_CHANNEL.append(OWNER_ID)
 AUTH_CHANNEL += SUDO_USERS
+
 # Download Directory >>>>>>>>>>>
 DOWNLOAD_LOCATION = "./DOWNLOADS"
 
@@ -151,20 +155,19 @@ EMAIL = os.environ.get("EMAIL", "mysterysd.sd@gmail.com")
 PWSSD = os.environ.get("PWSSD", "S#D#97531")
 GDRIVE_FOLDER_ID = os.environ.get("GDRIVE_FOLDER_ID", "0AN3LeVWuYvwEUk9PVA")
 CRYPT = os.environ.get("CRYPT", "S3htTzl3aDdHUWdJWDhLZVV2MlpSVGlkZ0RVYU0xc29oQlNKSENGakRaOD0%3D")
-#PHPSESSID = os.environ.get("PHPSESSID", "dslvec02r5mo3co40vsq6154eh")
 HUB_CRYPT = os.environ.get("HUB_CRYPT", "dVAwSkpDU0FWVnNYV3hSZU40RkhrRU53RzVmdjVBbFd3RThPeFllMmhSND0%3D")
 DRIVEFIRE_CRYPT = os.environ.get("DRIVEFIRE_CRYPT", "dVAwSkpDU0FWVnNYV3hSZU40RkhrRU53RzVmdjVBbFd3RThPeFllMmhSND0%3D")
-KATDRIVE_CRYPT = os.environ.get("KATDRIVE_CRYPT", "WlFKUldtYWJzNmJlWkEvajRscmVrSjhJRm8yNXdDZklqYXpxd1AxQ0Zwcz0%3D; __gads=ID=d116cbcd46cd789b:T=1653563306:S=ALNI_Mb-QZgpbYcINdk3rhsqxydUNpVLeQ")
-KOLOP_CRYPT = os.environ.get("KOLOP_CRYPT", "WlFKUldtYWJzNmJlWkEvajRscmVrSjhJRm8yNXdDZklqYXpxd1AxQ0Zwcz0%3D")
-DRIVEBUZZ_CRYPT = os.environ.get("DRIVEBUZZ_CRYPT", "dVAwSkpDU0FWVnNYV3hSZU40RkhrRU53RzVmdjVBbFd3RThPeFllMmhSND0%3D")
-GADRIVE_CRYPT = os.environ.get("GADRIVE_CRYPT", "dVAwSkpDU0FWVnNYV3hSZU40RkhrRU53RzVmdjVBbFd3RThPeFllMmhSND0%3D")
+KATDRIVE_CRYPT = os.environ.get("KATDRIVE_CRYPT", "")
+KOLOP_CRYPT = os.environ.get("KOLOP_CRYPT", "")
+DRIVEBUZZ_CRYPT = os.environ.get("DRIVEBUZZ_CRYPT", "")
+GADRIVE_CRYPT = os.environ.get("GADRIVE_CRYPT", "")
 STRING_SESSION = os.environ.get("STRING_SESSION", "")
 
 #Bot Command [IMDB]  >>>>>>>>>>>
 CUSTOM_CAPTION = os.environ.get("CUSTOM_CAPTION", "")
 MAX_LIST_ELM = os.environ.get("MAX_LIST_ELM", None)
 DEF_IMDB_TEMPLATE = os.environ.get("IMDB_TEMPLATE", """<i><b>⚡𝐓𝐢𝐭𝐥𝐞: </b> {title}
-<b>⚡𝐈𝐌𝐃𝐁 𝐑𝐚𝐭𝐢𝐧𝐠 :</b> <code>{rating} </code>
+<b>⚡𝐈𝐌𝐃𝐁 𝐑𝐚𝐭𝐢𝐧g :</b> <code>{rating} </code>
 <b>⚡𝐐𝐮𝐚𝐥𝐢𝐭𝐲:  </b>
 <b>⚡𝐑𝐞𝐥𝐞𝐚𝐬𝐞 𝐃𝐚𝐭𝐞: </b> {release_date}
 <b>⚡𝐆𝐞𝐧𝐫𝐞: </b>{genres}
@@ -200,14 +203,14 @@ _lock = asyncio.Lock()
 
 # Rclone Config Via any raw url
 ###########################################################################
-try:                                                                      #
-    RCLONE_CONF_URL = os.environ.get('RCLONE_CONF_URL', "")               #
-    if len(RCLONE_CONF_URL) == 0:                                         #
-        RCLONE_CONF_URL = None                                            #
-    else:                                                                 #
-        urllib.request.urlretrieve(RCLONE_CONF_URL, '/app/rclone.conf')   #
-except KeyError:                                                          #
-    RCLONE_CONF_URL = None                                                #
+try:
+    RCLONE_CONF_URL = os.environ.get('RCLONE_CONF_URL', "")
+    if len(RCLONE_CONF_URL) == 0:
+        RCLONE_CONF_URL = None
+    else:
+        urllib.request.urlretrieve(RCLONE_CONF_URL, '/app/rclone.conf')
+except KeyError:
+    RCLONE_CONF_URL = None
 ###########################################################################
 
 def multi_rclone_init():
@@ -224,14 +227,75 @@ def multi_rclone_init():
 
 multi_rclone_init()
 
-# Pyrogram Client Intialization >>>>>>>>>>>
-app = Client("LeechBot", bot_token=TG_BOT_TOKEN, api_id=APP_ID, api_hash=API_HASH, workers=343)
+# --------------- AUTO UPDATE guard ---------------
+# Default OFF to avoid git pull errors in read-only envs (Koyeb etc.)
+AUTO_UPDATE = os.environ.get("AUTO_UPDATE", "False").lower() in ("1", "true", "yes")
+if AUTO_UPDATE:
+    LOGGER.info("AUTO_UPDATE enabled. Will attempt git updates if container allows.")
+else:
+    LOGGER.info("AUTO_UPDATE disabled. Skipping git pull to avoid permission errors.")
+
+# Pyrogram Client Initialization >>>>>>>>>>>
+# Keep names used elsewhere: app (Pyrogram bot client) and userBot (optional user client)
+try:
+    # Try to ensure types are correct for Pyrogram init
+    _api_id = int(APP_ID) if isinstance(APP_ID, str) and APP_ID.isdigit() else APP_ID
+    app = Client("LeechBot", bot_token=TG_BOT_TOKEN, api_id=int(_api_id), api_hash=API_HASH, workers=343)
+    LOGGER.info("Pyrogram bot client (app) created.")
+except Exception as e:
+    LOGGER.exception("Failed to create Pyrogram bot client: %s", e)
+    app = None
+
 if STRING_SESSION:
-    userBot = Client("Tele-UserBot", api_id=APP_ID, api_hash=API_HASH, session_string=STRING_SESSION)
-    LOGGER.info("[PRM] Initiated USERBOT") #Logging is Needed Very Much
+    try:
+        userBot = Client("Tele-UserBot", api_id=int(_api_id), api_hash=API_HASH, session_string=STRING_SESSION)
+        LOGGER.info("[PRM] Initiated USERBOT")
+    except Exception as e:
+        LOGGER.exception("Failed to create userBot: %s", e)
+        userBot = None
+else:
+    userBot = None
 
-updater = tg.Updater(token=TG_BOT_TOKEN)
-dispatcher = updater.dispatcher
-updater.start_polling()
+# ------------------ python-telegram-bot (PTB) Updater & dispatcher ------------------
+updater = None
+dispatcher = None
+bot = None  # exported name expected by __main__.py
 
+try:
+    # Initialize PTB Updater (v13.x style). Wrap in try to avoid import-time crash.
+    LOGGER.debug("Attempting to initialize python-telegram-bot Updater...")
+    updater = tg.Updater(token=TG_BOT_TOKEN, use_context=True)
+    dispatcher = updater.dispatcher
+    # create a Bot object for compatibility imports (some code expects 'bot')
+    if TgBot is not None:
+        bot = TgBot(token=TG_BOT_TOKEN)
+    else:
+        # fallback: try to access from updater
+        try:
+            bot = updater.bot
+        except Exception:
+            bot = None
 
+    # Start polling in background if possible
+    try:
+        updater.start_polling()
+        LOGGER.info("PTB Updater started polling.")
+    except Exception as e:
+        LOGGER.exception("Updater.start_polling() failed: %s", e)
+
+except Exception as e:
+    LOGGER.exception("Failed to initialize python-telegram-bot Updater/Dispatcher: %s", e)
+    updater = None
+    dispatcher = None
+    # ensure bot variable exists (may be None)
+    try:
+        if bot is None and TgBot is not None:
+            bot = TgBot(token=TG_BOT_TOKEN)
+    except Exception as _:
+        bot = None
+
+# Make sure these names exist so `from tobrot import app, bot, dispatcher, userBot` works
+__all__ = ["app", "bot", "updater", "dispatcher", "userBot", "LOGGER", "DOWNLOAD_LOCATION",
+           "TG_BOT_TOKEN", "APP_ID", "API_HASH", "OWNER_ID", "AUTH_CHANNEL"]
+
+LOGGER.info("tobrot module initialized. Exports available: %s", ", ".join(__all__))
