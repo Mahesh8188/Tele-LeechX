@@ -230,6 +230,8 @@ if STRING_SESSION:
     userBot = Client("Tele-UserBot", api_id=APP_ID, api_hash=API_HASH, session_string=STRING_SESSION)
     LOGGER.info("[PRM] Initiated USERBOT") #Logging is Needed Very Much
 
-updater = tg.Updater(token=TG_BOT_TOKEN)
-bot = updater.bot
-dispatcher = updater.dispatcher
+from telegram.ext import Application
+
+app = Application.builder().token(TG_BOT_TOKEN).build()
+app.run_polling()
+
