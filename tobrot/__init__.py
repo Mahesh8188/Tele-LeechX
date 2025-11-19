@@ -59,13 +59,13 @@ for imp in ["TG_BOT_TOKEN", "APP_ID", "API_HASH", "OWNER_ID", "AUTH_CHANNEL"]:
 '''
 
 # The Telegram API things >>>>>>>>>>>
-TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "5139162631:AAHGWHHbnbu7k5jOjXW-axcNuJcSRpBktr4")
-APP_ID = os.environ.get("APP_ID", "6878048")
-API_HASH = os.environ.get("API_HASH", "3833ae3a7415af46df46a83a3ba2c432")
-OWNER_ID = int(os.environ.get("OWNER_ID", "1242011540"))
+TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "7857092417:AAHqALkEC4YwpdFPTV0g3yQsdQkPI8hPpv0")
+APP_ID = os.environ.get("APP_ID", "26741021")
+API_HASH = os.environ.get("API_HASH", "7c5af0b88c33d2f5cce8df5d82eb2a94")
+OWNER_ID = int(os.environ.get("OWNER_ID", "6859451629"))
 
 # Authorised Chat Functions >>>>>>>>>>>
-AUTH_CHANNEL = [int(x) for x in os.environ.get("AUTH_CHANNEL", "-1001270496331 -1001508663868").split()]
+AUTH_CHANNEL = [int(x) for x in os.environ.get("AUTH_CHANNEL", "-1002084819782").split()]
 SUDO_USERS = [int(sudos) if (' ' not in os.environ.get('SUDO_USERS', '')) else int(sudos) for sudos in os.environ.get('SUDO_USERS', '').split()]
 AUTH_CHANNEL.append(OWNER_ID)
 AUTH_CHANNEL += SUDO_USERS
@@ -180,15 +180,15 @@ DEF_IMDB_TEMPLATE = os.environ.get("IMDB_TEMPLATE", """<i><b>⚡𝐓𝐢𝐭𝐥
 ⚡️✅ 𝑪𝒍𝒊𝒄𝒌 𝑫𝒐𝒘𝒏 𝒂𝒏𝒅 𝑺𝒕𝒂𝒓𝒕 𝒕𝒉𝒆 𝑩𝒐𝒕 𝒕𝒐 𝑮𝒆𝒕 𝒕𝒉𝒆 𝑭𝒊𝒍𝒆 ✅ !! ⬇️ ⬇️""")
 
 #Bot Command [Bot PM & Log Channel]  >>>>>>>>>>>
-LEECH_LOG = os.environ.get("LEECH_LOG", "-1001569981856")
+LEECH_LOG = os.environ.get("LEECH_LOG", "-1002084819782")
 EX_LEECH_LOG = os.environ.get("EX_LEECH_LOG", "")
 EXCEP_CHATS = os.environ.get("EXCEP_CHATS", "")
 BOT_PM = os.environ.get("BOT_PM", "True")
 SERVER_HOST = os.environ.get("SERVER_HOST", "Heroku")
 
 # 4 GB Upload Utils >>>>>>>>>>>
-PRM_USERS = os.environ.get("PRM_USERS", "1242011540 503170505")
-PRM_LOG = os.environ.get("PRM_LOG", "-1001620169370")
+PRM_USERS = os.environ.get("PRM_USERS", "6859451629")
+PRM_LOG = os.environ.get("PRM_LOG", "-1002084819782")
 
 BOT_START_TIME = time.time()
 # dict to control uploading and downloading
