@@ -20,7 +20,11 @@ psutil
 pyrogram==2.0.30
 python-dotenv
 pyprog
-python-telegram-bot
+
+# Telegram bot FIX
+python-telegram-bot==13.15
+httpx==0.23.3
+
 pybase64
 requests
 speedtest-cli
